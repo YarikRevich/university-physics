@@ -1,0 +1,2 @@
+18.12.2022:
+* Implement input data with a help of file
