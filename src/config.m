@@ -3,7 +3,7 @@ classdef config
     %   Detailed explanation goes here
     
     properties
-        Property1
+        Data
     end
     
     methods
@@ -27,14 +27,14 @@ classdef config
                 fclose(fileID);
             end
         end
-        
-        function outputArg = getConfig(obj,inputArg)
-            
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
-            outputArg = obj.Property1 + inputArg;
+
+        function [self] = set.Data(self, data)
+            self.Data = data;
         end
 
+        function [data] = get.Data(self)
+            data = self.Data;
+        end
     end
 end
 
