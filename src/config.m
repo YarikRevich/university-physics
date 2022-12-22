@@ -10,6 +10,7 @@ classdef config
         function obj = config()
             %CONFIG Construct an instance of this class
             %   Detailed explanation goes here
+
             [file,path] = uigetfile('*.txt');
             if isequal(file,0)
                 error("Your file extension should be txt only");
@@ -19,17 +20,19 @@ classdef config
                  if numberOfPoints == -1
                      error("Input file has a wrong structure");
                  end
-                 point = fgetl(fileID);
-                 while point ~= -1
-                    disp(point);
-                    point = fgetl(fileID);
+                 rawLine = fgetl(fileID);
+                 while rawLine ~= -1
+                    splitLine = split(rawLine, " ");
+                    pointX = str2double(splitLine{1});
+                    pointY = str2double(splitLine{2});
+                    pointCharge = str2double(splitLine{3});
+                    
+                    obj.Data = [obj.Data struct('pointX', pointX, 'pointY', pointY, 'pointCharge', pointCharge)];
+
+                    rawLine = fgetl(fileID);
                  end
                 fclose(fileID);
             end
-        end
-
-        function [self] = set.Data(self, data)
-            self.Data = data;
         end
 
         function [data] = get.Data(self)

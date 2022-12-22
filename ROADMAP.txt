@@ -1,2 +1,4 @@
 18.12.2022:
-* Implement input data with a help of file
+* Implemented input data with a help of file
+22.12.2022:
+* Implemented a correct draw of points
