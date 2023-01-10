@@ -3,40 +3,41 @@ classdef config
     %   Detailed explanation goes here
     
     properties
-        Data
+        outputFileID
     end
     
     methods
-        function obj = config()
-            %CONFIG Construct an instance of this class
-            %   Detailed explanation goes here
 
+        function self = config()
+            self.outputFileID = fopen("./output",'W', 'n', 'US-ASCII');
+        end
+        
+
+        function [r] = readFromInputFile(~)
+            r = [];
             [file,path] = uigetfile('*.txt');
             if isequal(file,0)
                 error("Your file extension should be txt only");
             else
                 fileID = fopen(fullfile(path,file),'r', 'n', 'US-ASCII');
-                numberOfPoints = fgetl(fileID);
-                 if numberOfPoints == -1
-                     error("Input file has a wrong structure");
-                 end
                  rawLine = fgetl(fileID);
                  while rawLine ~= -1
                     splitLine = split(rawLine, " ");
-                    pointX = str2double(splitLine{1});
-                    pointY = str2double(splitLine{2});
-                    pointCharge = str2double(splitLine{3});
+                    x = str2double(splitLine{1});
+                    y = str2double(splitLine{2});
+                    q = str2double(splitLine{3});
                     
-                    obj.Data = [obj.Data struct('pointX', pointX, 'pointY', pointY, 'pointCharge', pointCharge)];
+                    r = [r struct('x', x, 'y', y, 'charge', q)];
 
                     rawLine = fgetl(fileID);
                  end
                 fclose(fileID);
+                
             end
         end
 
-        function [data] = get.Data(self)
-            data = self.Data;
+        function writeToOutputFile(~, x, y, ax, ay, ex, ey)
+            fprintf(fileID, "%d %d", 10, 20);
         end
     end
 end
