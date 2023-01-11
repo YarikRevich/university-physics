@@ -1,6 +1,6 @@
 classdef simulation
     %SIMULATION 
-    %   
+    % Contains main simulation pipeline  
     
     properties(SetAccess = 'private', GetAccess = 'private')
         Config
@@ -21,7 +21,10 @@ classdef simulation
 
             retries = 0;
             while retries < 1000
+                clf('reset')
+                
                 hold on
+                
                 title('Change of electrical pole');
 
                 xlim([0, constants.PLOT_SIZE]);
@@ -43,6 +46,7 @@ classdef simulation
                         color = "magenta";
                     end
 
+                    self.Config.writeToOutputFile(charge.x, charge.y, charge.vx, charge.vy, charge.ax, charge.ay);
                     plot(charge.x, charge.y, "b*", 'MarkerSize', 5, 'Color', color)
                 end
                 hold off
@@ -50,9 +54,8 @@ classdef simulation
                 self.RandomCharges.Update(inputData);
                 retries = retries + 1;
                 pause(0.001)
-                clf('reset')
             end
-            close
+            self.Config.closeOutputFile();
         end
     end
 end

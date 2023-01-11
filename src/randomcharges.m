@@ -1,6 +1,8 @@
 classdef randomcharges < handle
-    %CHARGES Summary of this class goes here
-    %   Detailed explanation goes here
+    %RANDOMCHARGES Wrapper for random charges
+    %   Used as a part of a simulation pipeline
+    %   as a wrapper for random charges, which makes
+    %   it easier to modify and list previously generated charges. 
     
     properties
         Charges
@@ -8,7 +10,7 @@ classdef randomcharges < handle
     
     methods
         function self = randomcharges()
-            for i = 1:40
+            for i = 1:100
                 self.Charges = [self.Charges struct( ...
                     'x', self.getRandomNumberInRange(0, constants.PLOT_SIZE), ...
                     'y', self.getRandomNumberInRange(0, constants.PLOT_SIZE), ...
