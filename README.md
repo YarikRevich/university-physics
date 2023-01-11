@@ -9,7 +9,8 @@ A simulation of a change of an electrical pole, which supposed to be a universit
 - MATLAB(2022)
 
 ## Setup
-In order to setup the project, you should open the project file with of help of locally installed MATLAB application
+- Open the project file with of help of locally installed MATLAB application
+- Run 'main.m' function, which will start the simulation pipeline
 
 ## Status
 This project is stil maintaned
