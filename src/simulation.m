@@ -4,23 +4,30 @@ classdef simulation
     
     properties(SetAccess = 'private', GetAccess = 'private')
         Config
-        RandomCharges
+        ChargeManager
     end
     
     methods
         function self = simulation()
             self.Config = config();
-            self.RandomCharges = randomcharges();
+            self.ChargeManager = chargemanager();
         end
            
         function run(self)
             format long
+            
+            inputData = self.Config.ReadFromInputFile();
+            self.ChargeManager.SelectCharges();
+
+            if (~self.ChargeManager.Initialized)
+                return
+            end 
+
             figure('Units', 'pixels');
 
-            inputData = self.Config.readFromInputFile();
-
+            self.ChargeManager.Update(inputData);
             retries = 0;
-            while retries < 1000
+            while retries < 1000 && self.ChargeManager.GetNumberOfAvailableCharges() ~= 0
                 clf('reset')
                 
                 hold on
@@ -35,7 +42,7 @@ classdef simulation
                     plot(data.x, data.y, "b*", 'Color', "black", 'MarkerSize', 17);
                 end 
 
-                for charge = self.RandomCharges.Charges
+                for charge = self.ChargeManager.Charges
                     if (charge.x > constants.PLOT_SIZE || charge.y > constants.PLOT_SIZE)
                         continue
                     end
@@ -46,16 +53,18 @@ classdef simulation
                         color = "magenta";
                     end
 
-                    self.Config.writeToOutputFile(charge.x, charge.y, charge.vx, charge.vy, charge.ax, charge.ay);
+                    self.Config.WriteFieldCharacteristics(charge.x, charge.y, charge.charge, charge.ex, charge.ey, charge.e, charge.v);
+                    self.Config.WriteCalculations(charge.x, charge.y, charge.vx, charge.vy, charge.ax, charge.ay);
                     plot(charge.x, charge.y, "b*", 'MarkerSize', 5, 'Color', color)
                 end
                 hold off
                 
-                self.RandomCharges.Update(inputData);
+                self.ChargeManager.Update(inputData);
                 retries = retries + 1;
-                pause(0.001)
+                pause(constants.PLOT_PAUSE)
             end
-            self.Config.closeOutputFile();
+            close
+            self.Config.CloseFiles();
         end
     end
 end
