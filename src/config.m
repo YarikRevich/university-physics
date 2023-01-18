@@ -44,8 +44,12 @@ classdef config
             end
         end
 
-        function writeToOutputFile(self, x, y, vx, vy, ax, ay)
-            fprintf(self.outputFileID, "%f %f %f %f %f %f\n", x, y, vx, vy, ax, ay);
+        function writeCanvas(self, x, y, charge, ex, ey, e, v)
+            fprintf(self.outputFileID, "%f %f %.20f %.20f %.20f %.20f %.20f\n", x, y, charge, ex, ey, e, v);
+        end
+
+        function writeCalculations(self, x, y, charge, ex, ey, e, v)
+            fprintf(self.outputFileID, "%f %f %.20f %.20f %.20f %.20f %.20f\n", x, y, charge, ex, ey, e, v);
         end
 
         function closeOutputFile(self)
