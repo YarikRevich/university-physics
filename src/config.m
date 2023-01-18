@@ -3,18 +3,17 @@ classdef config
     %   Detailed explanation goes here
     
     properties
-        outputFileID
+        calculationsFileID
+        fieldCharacteristicsFileID
     end
     
     methods
-
         function self = config()
-            self.outputFileID = fopen("./output",'W', 'n', 'US-ASCII');
+            self.calculationsFileID = fopen("./calculations",'W', 'n', 'US-ASCII');
+            self.fieldCharacteristicsFileID = fopen("./field_characteristics",'W', 'n', 'US-ASCII');
         end
         
-
-        function [r] = readFromInputFile(~)
-            
+        function [r] = ReadFromInputFile(~)
             [file,path] = uigetfile('*.txt');
             if isequal(file,0)
                 error("Your file extension should be txt only");
@@ -44,16 +43,17 @@ classdef config
             end
         end
 
-        function writeCanvas(self, x, y, charge, ex, ey, e, v)
-            fprintf(self.outputFileID, "%f %f %.20f %.20f %.20f %.20f %.20f\n", x, y, charge, ex, ey, e, v);
+        function WriteFieldCharacteristics(self, x, y, charge, ex, ey, e, v)
+            fprintf(self.fieldCharacteristicsFileID, "%f %f %.20f %.20f %.20f %.20f %.20f\n", x, y, charge, ex, ey, e, v);
         end
 
-        function writeCalculations(self, x, y, charge, ex, ey, e, v)
-            fprintf(self.outputFileID, "%f %f %.20f %.20f %.20f %.20f %.20f\n", x, y, charge, ex, ey, e, v);
+        function WriteCalculations(self, x, y, vx, vy, ax, ay)
+            fprintf(self.calculationsFileID, "%f %f %f %f %f %f\n", x, y, vx, vy, ax, ay);
         end
 
-        function closeOutputFile(self)
-            fclose(self.outputFileID);
+        function CloseFiles(self)
+            fclose(self.calculationsFileID);
+            fclose(self.fieldCharacteristicsFileID);
         end
     end
 end

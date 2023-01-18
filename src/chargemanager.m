@@ -14,6 +14,8 @@ classdef chargemanager < handle
     end
     
     methods
+
+        % Creates a new charge using the data given by user using UI
         function setOwnTestCharge(self, ~, ~)
             prompt = {'X: ', 'Y: ', 'VX: ', 'VY: ', 'Charge: ', 'Mass: '};
             dlgtitle = 'Input';
@@ -77,8 +79,8 @@ classdef chargemanager < handle
         function SelectCharges(self)
             self.selectionWindow = figure();
             drawnow;
-            uicontrol("Style", "pushbutton", "Position", [100, 210, 150, 50], "String", "Set own test charge", "Callback", @self.setOwnTestCharge);
-            uicontrol("Style", "pushbutton", "Position", [300, 210, 150, 50], "String", "Generate random charges", "Callback", @self.generateRandomCharges);
+            uicontrol("Style", "pushbutton", 'FontSize', 16, "Position", [80, 210, 170, 50], "String", "Set own test charge", "Callback", @self.setOwnTestCharge);
+            uicontrol("Style", "pushbutton", 'FontSize', 16, "Position", [310, 210, 210, 50], "String", "Generate random charges", "Callback", @self.generateRandomCharges);
             waitfor(self.selectionWindow);
         end
 
@@ -104,7 +106,7 @@ classdef chargemanager < handle
             end
         end
 
-        function [r] = getNumberOfAvailableCharges(self)
+        function [r] = GetNumberOfAvailableCharges(self)
             r = 0;
             for i = 1:length(self.Charges)
                 if (self.Charges(i).x < constants.PLOT_SIZE && self.Charges(i).y < constants.PLOT_SIZE)

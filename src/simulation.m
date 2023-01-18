@@ -16,7 +16,7 @@ classdef simulation
         function run(self)
             format long
             
-            inputData = self.Config.readFromInputFile();
+            inputData = self.Config.ReadFromInputFile();
             self.ChargeManager.SelectCharges();
 
             if (~self.ChargeManager.Initialized)
@@ -27,7 +27,7 @@ classdef simulation
 
             self.ChargeManager.Update(inputData);
             retries = 0;
-            while retries < 1000 && self.ChargeManager.getNumberOfAvailableCharges() ~= 0
+            while retries < 1000 && self.ChargeManager.GetNumberOfAvailableCharges() ~= 0
                 clf('reset')
                 
                 hold on
@@ -47,15 +47,14 @@ classdef simulation
                         continue
                     end
 
-                    disp(charge.charge);
-
                     if (charge.charge > 0)
                         color = "#FF6347";
                     else
                         color = "magenta";
                     end
 
-                    self.Config.writeToOutputFile(charge.x, charge.y, charge.charge, charge.ex, charge.ey, charge.e, charge.v);
+                    self.Config.WriteFieldCharacteristics(charge.x, charge.y, charge.charge, charge.ex, charge.ey, charge.e, charge.v);
+                    self.Config.WriteCalculations(charge.x, charge.y, charge.vx, charge.vy, charge.ax, charge.ay);
                     plot(charge.x, charge.y, "b*", 'MarkerSize', 5, 'Color', color)
                 end
                 hold off
@@ -65,7 +64,7 @@ classdef simulation
                 pause(constants.PLOT_PAUSE)
             end
             close
-            self.Config.closeOutputFile();
+            self.Config.CloseFiles();
         end
     end
 end
