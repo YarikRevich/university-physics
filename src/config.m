@@ -9,8 +9,7 @@ classdef config
     
     methods
         function self = config()
-            self.calculationsFileID = fopen("./calculations",'W', 'n', 'US-ASCII');
-            self.fieldCharacteristicsFileID = fopen("./field_characteristics",'W', 'n', 'US-ASCII');
+            mkdir results
         end
         
         function [r] = ReadFromInputFile(~)
@@ -33,7 +32,6 @@ classdef config
                     y = str2double(splitLine{2});
                     q = str2double(splitLine{3});
 
-                    
                     r(index) = struct('x', x, 'y', y, 'charge', q);
 
                     rawLine = fgetl(fileID);
@@ -44,16 +42,22 @@ classdef config
         end
 
         function WriteFieldCharacteristics(self, x, y, charge, ex, ey, e, v)
-            fprintf(self.fieldCharacteristicsFileID, "%f %f %.20f %.20f %.20f %.20f %.20f\n", x, y, charge, ex, ey, e, v);
+%             self.calculationsFileID = fopen("./calculations",'W', 'n', 'US-ASCII');
+%             self.fieldCharacteristicsFileID = fopen("./field_characteristics",'W', 'n', 'US-ASCII');
+% 
+%             fprintf(self.fieldCharacteristicsFileID, "%f %f %.20f %.20f %.20f %.20f %.20f\n", x, y, charge, ex, ey, e, v);
         end
 
         function WriteCalculations(self, x, y, vx, vy, ax, ay)
-            fprintf(self.calculationsFileID, "%f %f %f %f %f %f\n", x, y, vx, vy, ax, ay);
+%             self.calculationsFileID = fopen("./calculations",'W', 'n', 'US-ASCII');
+%             self.fieldCharacteristicsFileID = fopen("./field_characteristics",'W', 'n', 'US-ASCII');
+% 
+%             fprintf(self.calculationsFileID, "%f %f %f %f %f %f\n", x, y, vx, vy, ax, ay);
         end
 
         function CloseFiles(self)
-            fclose(self.calculationsFileID);
-            fclose(self.fieldCharacteristicsFileID);
+%             fclose(self.calculationsFileID);
+%             fclose(self.fieldCharacteristicsFileID);
         end
     end
 end

@@ -115,7 +115,32 @@ classdef chargemanager < handle
             end
             
         end 
- 
+
+        function checkCollisionsForDynamicCharges(self, chargeIndex)
+            for i = 1:length(self.Charges)
+                if (i ~= chargeIndex)
+                    if (abs(self.Charges(chargeIndex).x - self.Charges(i).x) < 3 && abs(self.Charges(chargeIndex).y - self.Charges(i).y) < 3)
+                        self.Charges(chargeIndex).x = constants.OUT_OF_PLOT;
+                        self.Charges(chargeIndex).y = constants.OUT_OF_PLOT;
+
+                        self.Charges(i).x = constants.OUT_OF_PLOT;
+                        self.Charges(i).y = constants.OUT_OF_PLOT;
+                        break
+                    end
+                end 
+            end
+        end
+
+        function checkCollisionsForStaticCharges(self, inputData, chargeIndex)
+            for data = inputData
+                if (abs(self.Charges(chargeIndex).x - data.x) < 3 && abs(self.Charges(chargeIndex).y - data.y) < 3)
+                    self.Charges(chargeIndex).x = constants.OUT_OF_PLOT;
+                    self.Charges(chargeIndex).y = constants.OUT_OF_PLOT;
+                    break
+                end
+            end
+        end 
+
         function Update(self, inputData)
              for i = 1:length(self.Charges)
                 [e, ex, ey, v] = self.getFieldCharacteristicsAt(self.Charges(i).x, self.Charges(i).y, inputData);
@@ -137,12 +162,8 @@ classdef chargemanager < handle
                 self.Charges(i).ey = ey;
                 self.Charges(i).v = v;
 
-                for data = inputData
-                    if (abs(self.Charges(i).x - data.x) < 3 && abs(self.Charges(i).y - data.y) < 3)
-                        self.Charges(i).x = constants.OUT_OF_PLOT;
-                        self.Charges(i).y = constants.OUT_OF_PLOT;
-                    end
-                end
+                self.checkCollisionsForStaticCharges(inputData, i);
+                self.checkCollisionsForDynamicCharges(i);
              end
         end
     end
