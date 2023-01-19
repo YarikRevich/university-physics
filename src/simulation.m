@@ -5,12 +5,14 @@ classdef simulation
     properties(SetAccess = 'private', GetAccess = 'private')
         Config
         ChargeManager
+        TimeTracker
     end
     
     methods
         function self = simulation()
             self.Config = config();
             self.ChargeManager = chargemanager();
+            self.TimeTracker = timetracker();
         end
            
         function run(self)
@@ -28,9 +30,9 @@ classdef simulation
             figure('Units', 'pixels');
 
             self.ChargeManager.Update(inputData);
-            retries = 0;
+            iterations = 0;
             numberOfAvailableCharges = self.ChargeManager.GetNumberOfAvailableCharges();
-            while retries < 1000 && numberOfAvailableCharges ~= 0
+            while iterations < 1000 && numberOfAvailableCharges ~= 0
                 clf('reset')
                 
                 hold on
@@ -45,6 +47,7 @@ classdef simulation
                     plot(data.x, data.y, "b*", 'Color', "black", 'MarkerSize', 17);
                 end 
 
+                drawStart = tic;
                 for i = 1:length(self.ChargeManager.Charges)
                     if (self.ChargeManager.Charges(i).x > constants.PLOT_SIZE || self.ChargeManager.Charges(i).y > constants.PLOT_SIZE)
                         continue
@@ -63,20 +66,26 @@ classdef simulation
                         self.ChargeManager.Charges(i).ey, ...
                         self.ChargeManager.Charges(i).e, ...
                         self.ChargeManager.Charges(i).v);
-                    
+
+                    deltaTime = self.TimeTracker.getDeltaTime(i) + self.ChargeManager.Charges(i).lastCalculationTime + toc(drawStart) + constants.PLOT_PAUSE;
+
                     self.Config.WriteCalculations(i, ...
+                        deltaTime , ...
                         self.ChargeManager.Charges(i).x, ...
                         self.ChargeManager.Charges(i).y, ...
                         self.ChargeManager.Charges(i).vx, ...
                         self.ChargeManager.Charges(i).vy, ...
                         self.ChargeManager.Charges(i).ax, ...
                         self.ChargeManager.Charges(i).ay);
+
+                    self.TimeTracker.setDeltaTime(i, deltaTime);
+
                     plot(self.ChargeManager.Charges(i).x, self.ChargeManager.Charges(i).y, "b*", 'MarkerSize', 5, 'Color', color)
                 end
                 hold off
                 
                 self.ChargeManager.Update(inputData);
-                retries = retries + 1;
+                iterations = iterations + 1;
                 numberOfAvailableCharges = self.ChargeManager.GetNumberOfAvailableCharges();
                 pause(constants.PLOT_PAUSE)
             end

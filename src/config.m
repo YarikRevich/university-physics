@@ -52,18 +52,16 @@ classdef config < handle
                 self.outputFiles(strcat(num2str(i), "_", "field_characteristics")) = fopen(fullfile(constants.RESULT_FILE, num2str(i), "field_characteristics"), 'W', 'n', 'US-ASCII');
                 self.outputFiles(strcat(num2str(i), "_", "calculations")) = fopen(fullfile(constants.RESULT_FILE, num2str(i), "calculations"), 'W', 'n', 'US-ASCII');
             end
-
-            disp(self.outputFiles);
         end
 
         function WriteFieldCharacteristics(self, chargeIndex, x, y, charge, ex, ey, e, v)
              fprintf(self.outputFiles(strcat(num2str(chargeIndex), "_", "field_characteristics")),...
-                 "%f %f %.20f %.20f %.20f %.20f %.20f\n", x, y, charge, ex, ey, e, v);
+                 "%f %f %.30f %.30f %.30f %.30f %.30f\n", x, y, charge, ex, ey, e, v);
         end
 
-        function WriteCalculations(self, chargeIndex, x, y, vx, vy, ax, ay) 
+        function WriteCalculations(self, chargeIndex, t, x, y, vx, vy, ax, ay) 
              fprintf(self.outputFiles(strcat(num2str(chargeIndex), "_", "calculations")),...
-                 "%f %f %f %f %f %f\n", x, y, vx, vy, ax, ay);
+                 "%.20f %f %f %.30f %.30f %.30f %.30f\n", t, x, y, vx, vy, ax, ay);
         end
 
         function CloseFiles(self)

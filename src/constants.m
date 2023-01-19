@@ -16,6 +16,8 @@ classdef constants
         % notice all the changes in the graph
         PLOT_PAUSE = 0.001;
 
+        COLLISION_DISTANCE = 3;
+
         % Conventional K constant used in physics
         K = 9000000000;
 
