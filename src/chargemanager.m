@@ -30,7 +30,8 @@ classdef chargemanager < handle
             };
             answer = inputdlg(prompt,dlgtitle,dims,definput);
 
-            self.Charges = [self.Charges struct( ...
+            if (~isempty(answer))
+                self.Charges = [self.Charges struct( ...
                     'x', str2double(answer{1}), ...
                     'y', str2double(answer{2}), ...
                     'vx', str2double(answer{3}), ...
@@ -44,7 +45,8 @@ classdef chargemanager < handle
                     'ey', 0, ...
                     'v', 0)];
 
-            self.Initialized = true;
+                    self.Initialized = true;
+            end
             close(self.selectionWindow);
         end
 
@@ -76,6 +78,10 @@ classdef chargemanager < handle
             close(self.selectionWindow);
         end
 
+        function [r] = getNumberOfCharges(self)
+            r = length(self.Charges);
+        end
+
         function SelectCharges(self)
             self.selectionWindow = figure();
             drawnow;
@@ -89,7 +95,7 @@ classdef chargemanager < handle
         end 
 
         function [r] = getRandomNumberInRange(~, min, max)
-                r = (max-min).*rand(1,1) + min;
+            r = (max-min).*rand(1,1) + min;
         end
 
         function [e, ex, ey, v] = getFieldCharacteristicsAt(~, x, y, inputData)
@@ -102,18 +108,17 @@ classdef chargemanager < handle
                 r = sqrt(((x - data.x) ^ 2) + ((y - data.y) ^ 2));
                 ex = ex + (e * (x - data.x) / r);
                 ey = ey + (e * (y - data.y) / r);
-                v = v + (e / r);
+                v = v + (e * r);
             end
         end
 
         function [r] = GetNumberOfAvailableCharges(self)
             r = 0;
             for i = 1:length(self.Charges)
-                if (self.Charges(i).x < constants.PLOT_SIZE && self.Charges(i).y < constants.PLOT_SIZE)
+                if (self.Charges(i).x > 0 && self.Charges(i).x < constants.PLOT_SIZE && self.Charges(i).y > 0 && self.Charges(i).y < constants.PLOT_SIZE)
                     r = r + 1;
                 end
             end
-            
         end 
 
         function checkCollisionsForDynamicCharges(self, chargeIndex)

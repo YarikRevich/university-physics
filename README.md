@@ -8,6 +8,14 @@ A simulation of a change of an electrical pole, which supposed to be a universit
 ## Technologies
 - MATLAB(2022)
 
+## Calculations
+
+### Calculation of a field intension
+
+
+
+### Calculation of a field potencial
+
 ## Setup
 - Open the project file with of help of locally installed MATLAB application
 - Run 'main.m' function, which will start the simulation pipeline
