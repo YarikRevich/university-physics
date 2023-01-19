@@ -30,7 +30,8 @@ classdef chargemanager < handle
             };
             answer = inputdlg(prompt,dlgtitle,dims,definput);
 
-            self.Charges = [self.Charges struct( ...
+            if (~isempty(answer))
+                self.Charges = [self.Charges struct( ...
                     'x', str2double(answer{1}), ...
                     'y', str2double(answer{2}), ...
                     'vx', str2double(answer{3}), ...
@@ -42,9 +43,11 @@ classdef chargemanager < handle
                     'e', 0,...
                     'ex', 0, ...
                     'ey', 0, ...
-                    'v', 0)];
+                    'v', 0, ...
+                    'lastCalculationTime', 0)];
 
-            self.Initialized = true;
+                    self.Initialized = true;
+            end
             close(self.selectionWindow);
         end
 
@@ -70,10 +73,15 @@ classdef chargemanager < handle
                     'e', 0,...
                     'ex', 0, ...
                     'ey', 0, ...
-                    'v', 0)];
+                    'v', 0, ...
+                    'lastCalculationTime', 0)];
             end
             self.Initialized = true;
             close(self.selectionWindow);
+        end
+
+        function [r] = getNumberOfCharges(self)
+            r = length(self.Charges);
         end
 
         function SelectCharges(self)
@@ -85,11 +93,11 @@ classdef chargemanager < handle
         end
 
         function [r] = get.Charges(self)
-                r = self.Charges;
+            r = self.Charges;
         end 
 
         function [r] = getRandomNumberInRange(~, min, max)
-                r = (max-min).*rand(1,1) + min;
+            r = (max-min).*rand(1,1) + min;
         end
 
         function [e, ex, ey, v] = getFieldCharacteristicsAt(~, x, y, inputData)
@@ -102,22 +110,48 @@ classdef chargemanager < handle
                 r = sqrt(((x - data.x) ^ 2) + ((y - data.y) ^ 2));
                 ex = ex + (e * (x - data.x) / r);
                 ey = ey + (e * (y - data.y) / r);
-                v = v + (e / r);
+                v = v + (e * r);
             end
         end
 
         function [r] = GetNumberOfAvailableCharges(self)
             r = 0;
             for i = 1:length(self.Charges)
-                if (self.Charges(i).x < constants.PLOT_SIZE && self.Charges(i).y < constants.PLOT_SIZE)
+                if (self.Charges(i).x > 0 && self.Charges(i).x < constants.PLOT_SIZE && self.Charges(i).y > 0 && self.Charges(i).y < constants.PLOT_SIZE)
                     r = r + 1;
                 end
             end
-            
         end 
- 
+
+        function checkCollisionsForDynamicCharges(self, chargeIndex)
+            for i = 1:length(self.Charges)
+                if (i ~= chargeIndex)
+                    if (abs(self.Charges(chargeIndex).x - self.Charges(i).x) < constants.COLLISION_DISTANCE && abs(self.Charges(chargeIndex).y - self.Charges(i).y) < constants.COLLISION_DISTANCE)
+                        self.Charges(chargeIndex).x = constants.OUT_OF_PLOT;
+                        self.Charges(chargeIndex).y = constants.OUT_OF_PLOT;
+
+                        self.Charges(i).x = constants.OUT_OF_PLOT;
+                        self.Charges(i).y = constants.OUT_OF_PLOT;
+                        break
+                    end
+                end 
+            end
+        end
+
+        function checkCollisionsForStaticCharges(self, inputData, chargeIndex)
+            for data = inputData
+                if (abs(self.Charges(chargeIndex).x - data.x) < constants.COLLISION_DISTANCE && abs(self.Charges(chargeIndex).y - data.y) < constants.COLLISION_DISTANCE)
+                    self.Charges(chargeIndex).x = constants.OUT_OF_PLOT;
+                    self.Charges(chargeIndex).y = constants.OUT_OF_PLOT;
+                    break
+                end
+            end
+        end 
+
         function Update(self, inputData)
              for i = 1:length(self.Charges)
+                updateStart = tic;
+
                 [e, ex, ey, v] = self.getFieldCharacteristicsAt(self.Charges(i).x, self.Charges(i).y, inputData);
                 if ((ex == Inf || ex == -Inf) || (ey == Inf || ey == -Inf))
                         continue
@@ -137,12 +171,10 @@ classdef chargemanager < handle
                 self.Charges(i).ey = ey;
                 self.Charges(i).v = v;
 
-                for data = inputData
-                    if (abs(self.Charges(i).x - data.x) < 3 && abs(self.Charges(i).y - data.y) < 3)
-                        self.Charges(i).x = constants.OUT_OF_PLOT;
-                        self.Charges(i).y = constants.OUT_OF_PLOT;
-                    end
-                end
+                self.checkCollisionsForStaticCharges(inputData, i);
+                self.checkCollisionsForDynamicCharges(i);
+
+                self.Charges(i).lastCalculationTime = toc(updateStart);
              end
         end
     end

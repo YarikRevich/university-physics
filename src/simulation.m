@@ -5,12 +5,14 @@ classdef simulation
     properties(SetAccess = 'private', GetAccess = 'private')
         Config
         ChargeManager
+        TimeTracker
     end
     
     methods
         function self = simulation()
             self.Config = config();
             self.ChargeManager = chargemanager();
+            self.TimeTracker = timetracker();
         end
            
         function run(self)
@@ -23,11 +25,14 @@ classdef simulation
                 return
             end 
 
+            self.Config.CreateOutputFiles(self.ChargeManager.getNumberOfCharges());
+
             figure('Units', 'pixels');
 
             self.ChargeManager.Update(inputData);
-            retries = 0;
-            while retries < 1000 && self.ChargeManager.GetNumberOfAvailableCharges() ~= 0
+            iterations = 0;
+            numberOfAvailableCharges = self.ChargeManager.GetNumberOfAvailableCharges();
+            while iterations < 1000 && numberOfAvailableCharges ~= 0
                 clf('reset')
                 
                 hold on
@@ -42,25 +47,46 @@ classdef simulation
                     plot(data.x, data.y, "b*", 'Color', "black", 'MarkerSize', 17);
                 end 
 
-                for charge = self.ChargeManager.Charges
-                    if (charge.x > constants.PLOT_SIZE || charge.y > constants.PLOT_SIZE)
+                drawStart = tic;
+                for i = 1:length(self.ChargeManager.Charges)
+                    if (self.ChargeManager.Charges(i).x > constants.PLOT_SIZE || self.ChargeManager.Charges(i).y > constants.PLOT_SIZE)
                         continue
                     end
 
-                    if (charge.charge > 0)
+                    if (self.ChargeManager.Charges(i).charge > 0)
                         color = "#FF6347";
                     else
                         color = "magenta";
                     end
 
-                    self.Config.WriteFieldCharacteristics(charge.x, charge.y, charge.charge, charge.ex, charge.ey, charge.e, charge.v);
-                    self.Config.WriteCalculations(charge.x, charge.y, charge.vx, charge.vy, charge.ax, charge.ay);
-                    plot(charge.x, charge.y, "b*", 'MarkerSize', 5, 'Color', color)
+                    self.Config.WriteFieldCharacteristics(i, self.ChargeManager.Charges(i).x, ...
+                        self.ChargeManager.Charges(i).y, ...
+                        self.ChargeManager.Charges(i).charge, ...
+                        self.ChargeManager.Charges(i).ex, ...
+                        self.ChargeManager.Charges(i).ey, ...
+                        self.ChargeManager.Charges(i).e, ...
+                        self.ChargeManager.Charges(i).v);
+
+                    deltaTime = self.TimeTracker.getDeltaTime(i) + self.ChargeManager.Charges(i).lastCalculationTime + toc(drawStart) + constants.PLOT_PAUSE;
+
+                    self.Config.WriteCalculations(i, ...
+                        deltaTime , ...
+                        self.ChargeManager.Charges(i).x, ...
+                        self.ChargeManager.Charges(i).y, ...
+                        self.ChargeManager.Charges(i).vx, ...
+                        self.ChargeManager.Charges(i).vy, ...
+                        self.ChargeManager.Charges(i).ax, ...
+                        self.ChargeManager.Charges(i).ay);
+
+                    self.TimeTracker.setDeltaTime(i, deltaTime);
+
+                    plot(self.ChargeManager.Charges(i).x, self.ChargeManager.Charges(i).y, "b*", 'MarkerSize', 5, 'Color', color)
                 end
                 hold off
                 
                 self.ChargeManager.Update(inputData);
-                retries = retries + 1;
+                iterations = iterations + 1;
+                numberOfAvailableCharges = self.ChargeManager.GetNumberOfAvailableCharges();
                 pause(constants.PLOT_PAUSE)
             end
             close

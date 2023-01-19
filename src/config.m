@@ -1,16 +1,17 @@
-classdef config
+classdef config < handle
     %CONFIG 
     %   Detailed explanation goes here
     
     properties
+        outputFiles
         calculationsFileID
         fieldCharacteristicsFileID
     end
     
     methods
         function self = config()
-            self.calculationsFileID = fopen("./calculations",'W', 'n', 'US-ASCII');
-            self.fieldCharacteristicsFileID = fopen("./field_characteristics",'W', 'n', 'US-ASCII');
+            rmdir('results', 's');
+            mkdir results
         end
         
         function [r] = ReadFromInputFile(~)
@@ -33,7 +34,6 @@ classdef config
                     y = str2double(splitLine{2});
                     q = str2double(splitLine{3});
 
-                    
                     r(index) = struct('x', x, 'y', y, 'charge', q);
 
                     rawLine = fgetl(fileID);
@@ -43,17 +43,31 @@ classdef config
             end
         end
 
-        function WriteFieldCharacteristics(self, x, y, charge, ex, ey, e, v)
-            fprintf(self.fieldCharacteristicsFileID, "%f %f %.20f %.20f %.20f %.20f %.20f\n", x, y, charge, ex, ey, e, v);
+        function self = CreateOutputFiles(self, numberOfOutputFiles)
+            self.outputFiles = containers.Map();
+
+            for i = 1:numberOfOutputFiles
+                mkdir(constants.RESULT_FILE, num2str(i))
+
+                self.outputFiles(strcat(num2str(i), "_", "field_characteristics")) = fopen(fullfile(constants.RESULT_FILE, num2str(i), "field_characteristics"), 'W', 'n', 'US-ASCII');
+                self.outputFiles(strcat(num2str(i), "_", "calculations")) = fopen(fullfile(constants.RESULT_FILE, num2str(i), "calculations"), 'W', 'n', 'US-ASCII');
+            end
         end
 
-        function WriteCalculations(self, x, y, vx, vy, ax, ay)
-            fprintf(self.calculationsFileID, "%f %f %f %f %f %f\n", x, y, vx, vy, ax, ay);
+        function WriteFieldCharacteristics(self, chargeIndex, x, y, charge, ex, ey, e, v)
+             fprintf(self.outputFiles(strcat(num2str(chargeIndex), "_", "field_characteristics")),...
+                 "%f %f %.30f %.30f %.30f %.30f %.30f\n", x, y, charge, ex, ey, e, v);
+        end
+
+        function WriteCalculations(self, chargeIndex, t, x, y, vx, vy, ax, ay) 
+             fprintf(self.outputFiles(strcat(num2str(chargeIndex), "_", "calculations")),...
+                 "%.20f %f %f %.30f %.30f %.30f %.30f\n", t, x, y, vx, vy, ax, ay);
         end
 
         function CloseFiles(self)
-            fclose(self.calculationsFileID);
-            fclose(self.fieldCharacteristicsFileID);
+            for key = keys(self.outputFiles)
+                fclose(self.outputFiles(key{1}));
+            end
         end
     end
 end
