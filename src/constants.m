@@ -22,7 +22,7 @@ classdef constants
         K = 9000000000;
 
         % Result file folder name, which contains all output files
-        RESULT_FILE = "results";
+        RESULT_FOLDER = "results";
     end
 
 end

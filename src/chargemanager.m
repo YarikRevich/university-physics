@@ -57,7 +57,7 @@ classdef chargemanager < handle
             prompt = {'Enter number of charges to be generated:'};
             dlgtitle = 'Input';
             dims = [1, 35];
-            definput = {'30'};
+            definput = {'5'};
             answer = inputdlg(prompt,dlgtitle,dims,definput);
             
             for i = 1:str2double(answer)

@@ -49,7 +49,7 @@ classdef simulation
 
                 drawStart = tic;
                 for i = 1:length(self.ChargeManager.Charges)
-                    if (self.ChargeManager.Charges(i).x > constants.PLOT_SIZE || self.ChargeManager.Charges(i).y > constants.PLOT_SIZE)
+                    if (self.ChargeManager.Charges(i).x < 0 || self.ChargeManager.Charges(i).x > constants.PLOT_SIZE || self.ChargeManager.Charges(i).y < 0 || self.ChargeManager.Charges(i).y > constants.PLOT_SIZE)
                         continue
                     end
 
