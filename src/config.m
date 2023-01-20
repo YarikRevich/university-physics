@@ -10,8 +10,11 @@ classdef config < handle
     
     methods
         function self = config()
-            rmdir('results', 's');
-            mkdir results
+            if exist(constants.RESULT_FOLDER, 'dir')
+                rmdir(constants.RESULT_FOLDER, 's');
+            end
+            
+            mkdir(constants.RESULT_FOLDER)
         end
         
         function [r] = ReadFromInputFile(~)
@@ -47,10 +50,10 @@ classdef config < handle
             self.outputFiles = containers.Map();
 
             for i = 1:numberOfOutputFiles
-                mkdir(constants.RESULT_FILE, num2str(i))
+                mkdir(constants.RESULT_FOLDER, num2str(i))
 
-                self.outputFiles(strcat(num2str(i), "_", "field_characteristics")) = fopen(fullfile(constants.RESULT_FILE, num2str(i), "field_characteristics"), 'W', 'n', 'US-ASCII');
-                self.outputFiles(strcat(num2str(i), "_", "calculations")) = fopen(fullfile(constants.RESULT_FILE, num2str(i), "calculations"), 'W', 'n', 'US-ASCII');
+                self.outputFiles(strcat(num2str(i), "_", "field_characteristics")) = fopen(fullfile(constants.RESULT_FOLDER, num2str(i), "field_characteristics"), 'W', 'n', 'US-ASCII');
+                self.outputFiles(strcat(num2str(i), "_", "calculations")) = fopen(fullfile(constants.RESULT_FOLDER, num2str(i), "calculations"), 'W', 'n', 'US-ASCII');
             end
         end
 
