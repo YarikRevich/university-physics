@@ -27,7 +27,7 @@ classdef simulation
 
             self.Config.CreateOutputFiles(self.ChargeManager.getNumberOfCharges());
 
-            figure('Units', 'pixels');
+            figure('Units', 'pixels', 'Position', [150, 0, 1000, 1000]);
 
             self.ChargeManager.Update(inputData);
             iterations = 0;
@@ -37,14 +37,14 @@ classdef simulation
                 
                 hold on
                 
-                title('Change of electrical pole');
+                title('Simulation of charge movement under the influence of an electric field');
 
                 xlim([0, constants.PLOT_SIZE]);
                 ylim([0, constants.PLOT_SIZE]);
 
                 grid on
                 for data  = inputData
-                    plot(data.x, data.y, "b*", 'Color', "black", 'MarkerSize', 17);
+                    plot(data.x, data.y, "b*", 'Color', "black", 'MarkerSize', 21);
                 end 
 
                 drawStart = tic;
@@ -80,7 +80,8 @@ classdef simulation
 
                     self.TimeTracker.setDeltaTime(i, deltaTime);
 
-                    plot(self.ChargeManager.Charges(i).x, self.ChargeManager.Charges(i).y, "b*", 'MarkerSize', 5, 'Color', color)
+                    plot(self.ChargeManager.Charges(i).x, self.ChargeManager.Charges(i).y, "b*", 'MarkerSize', 11, 'Color', color)
+                    text(self.ChargeManager.Charges(i).x, self.ChargeManager.Charges(i).y + 3, num2str(i), 'VerticalAlignment','bottom','HorizontalAlignment','right')
                 end
                 hold off
                 
